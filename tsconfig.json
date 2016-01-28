@@ -1,0 +1,13 @@
+{ 
+  "compilerOptions" :  { 
+    "module" : "commonjs", 
+    "jsx" : "react",
+    "sourceMap": true,
+    "moduleResolution": "classic"
+  },
+  "files" : [
+      "typings/tsd.d.ts", 
+      "sources/js/main.tsx",
+      "sources/js/services.ts"
+  ]
+}
