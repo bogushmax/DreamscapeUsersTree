@@ -1,5 +1,3 @@
-//var HtmlWebpackPlugin = require('html-webpack-plugin');
-
 module.exports = {  
   entry: './sources/js/bootstrap.tsx',
   output: {
@@ -16,14 +14,5 @@ module.exports = {
       { test: /\.tsx?$/, loader: 'ts-loader' }
     ]
   },
-  plugins: [
-/*
-    new HtmlWebpackPlugin({
-      title: 'Dreamscape',
-      filename: './publish/index.html',
-      template: './sources/index.html'
-    })
-*/
-  ]
-
+  plugins: []
 }

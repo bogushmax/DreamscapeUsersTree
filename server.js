@@ -3,11 +3,10 @@
 //
 // A simple chat server using Socket.IO, Express, and Async.
 //
-var http = require('http');
 var path = require('path');
+var http = require('http');
 var fs   = require('fs');
 
-var async    = require('async');
 var socketio = require('socket.io');
 var express  = require('express');
 
@@ -50,36 +49,35 @@ var traverse = (json, accessor, traverser) => {
 
 var validate = (users) => {
   var usersCounts = {
-    DIRECTOR:        0,
-    DEPUTY_DIRECTOR: 0,
-    CONTRACTOR:      0,
-    COURIER:         0
+    director:       0,
+    deputyDirector: 0,
+    contractor:     0,
+    courier:        0
   };
   traverse(users, (user) => user.subordinates, (user) => {
     switch (user.type) {
       case usersTypes.DIRECTOR:
-          usersCounts.DIRECTOR++;
+          usersCounts.director++;
         break;
       case usersTypes.DEPUTY_DIRECTOR:
-          usersCounts.DEPUTY_DIRECTOR++;
+          usersCounts.deputyDirector++;
         break;
       case usersTypes.CONTRACTOR:
-          usersCounts.CONTRACTOR++;
+          usersCounts.contractor++;
         break;
       case usersTypes.COURIER:
-          usersCounts.COURIER++;
+          usersCounts.courier++;
         break;
     }
   });
-  console.log(usersCounts);
-  return (usersCounts.DIRECTOR   <= usersConstraints.DIRECTOR   && usersCounts.DEPUTY_DIRECTOR <= usersConstraints.DEPUTY_DIRECTOR &&
-          usersCounts.CONTRACTOR <= usersConstraints.CONTRACTOR && usersCounts.COURIER         <= usersConstraints.COURIER);
+  return (usersCounts.director   <= usersConstraints.DIRECTOR   && usersCounts.deputyDirector <= usersConstraints.DEPUTY_DIRECTOR &&
+          usersCounts.contractor <= usersConstraints.CONTRACTOR && usersCounts.courier        <= usersConstraints.COURIER);
 }
 
 //
 // Define users globally
 //
-var users;
+var data = {};
 
 //
 // Networking
@@ -93,13 +91,15 @@ var startNetworking = () => {
     });
     
     socket.on('getUsers', () => {
-      socket.emit('updateUsers', users);
+      socket.emit('updateUsers', data);
     });
     
-    socket.on('changeUsers', (newUsers) => {
-      if (validate(newUsers)) {
-        users = newUsers;
-        socket.broadcast.emit('updateUsers', users);
+    socket.on('changeUsers', (newData) => {
+      if (validate(newData.users)) {
+        data.users = newData.users;
+        socket.broadcast.emit('updateUsers', data);
+      } else {
+        socket.emit('updateUsers', data);
       }
     });
   });
@@ -108,21 +108,25 @@ var startNetworking = () => {
 //
 // Persistence implementation
 //
+var startPersisting = () => {
+  setInterval(() => {
+    fs.writeFile('./users.json', JSON.stringify(data.users), (error) => {
+      if (error) throw error;
+    });
+  }, 1000);
+}
+
 fs.readFile('./users.json', 'utf8', (error, usersRaw) => {
   if (error) throw error;
   var newUsers = JSON.parse(usersRaw);
   if (validate(newUsers)) {
-    users = newUsers;
+    data.users = newUsers;
+    startPersisting();
     startNetworking();
   } else {
     throw new Error('Invalid users.json');
   }
 });
 
-setInterval(() => {
-  fs.writeFile('./users.json', JSON.stringify(users), (error) => {
-    if (error) throw error;
-  });
-}, 1000);
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0");

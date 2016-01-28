@@ -1,6 +1,7 @@
 var gulp          = require("gulp");
 var gutil         = require("gulp-util");
 var webpack       = require("webpack");
+var jade 		  = require('gulp-jade');
 var webpackConfig = require("./webpack.config");
 
 gulp.task("build-dev", ["webpack:build-watch", "static:build-dev"]);
@@ -19,6 +20,6 @@ gulp.task("webpack:build-watch", function() {
 });
 
 gulp.task("static:build-dev", function(callback) {
-    gulp.src(["./sources/index.html", "./sources/css/**/*.css"])
-        .pipe(gulp.dest("./publish/"));
+	gulp.src("./sources/index.jade").pipe(jade()).pipe(gulp.dest("./publish/"));
+	gulp.src("./sources/css/**/*.css").pipe(gulp.dest("./publish/"));
 });

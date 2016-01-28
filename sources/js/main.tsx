@@ -9,8 +9,8 @@ class Main extends React.Component<any, any> {
       super(props);
       this.state = {};
       this.services = new Services();
-      this.services.addUpdateUsersListener((rootUser : {}) => {
-        this.setState({ rootUser: rootUser });
+      this.services.addUpdateUsersListener((data : {}) => {
+        this.setState({ data: data });
       });
       this.services.addConnectListener(() => {
         this.services.sendUsersUpdateRequest();
@@ -23,31 +23,20 @@ class Main extends React.Component<any, any> {
                 // Just swap name
                 var tempName;
                 
-                tempName = parentUser.name;
+                tempName        = parentUser.name;
                 parentUser.name = user.name;
-                user.name = tempName;
+                user.name       = tempName;
 
-                this.services.sendUsersChangeMessage(this.state.rootUser);
-                
-                this.setState({ rootUser: this.state.rootUser, lastRaisedUser: parentUser });
+                this.services.sendUsersChangeMessage(this.state.data);
+                this.setState({ rootUser: this.state.data.users, lastRaisedUser: parentUser });
             }
         }
     }
 
-    /*    
-    onMoveToLeftChief(parentUser, user) {
-
-    }
-
-    onMoveToRightChief(parentUser, user) {
-    
-    }
-    */
-
     render() {
         return (
             <div className="tree">
-                {this.state.rootUser ? <ul><Node user={this.state.rootUser} parentUser=null onRaise={this.onRaise.bind(this)} /></ul> : false}
+                { (this.state.data && this.state.data.users) ? <Node user={this.state.data.users} parentUser={null} onRaise={this.onRaise.bind(this)} /> : false }
             </div>
         );
     }

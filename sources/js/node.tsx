@@ -14,17 +14,20 @@ class Node extends React.Component<any, any> {
                 }
             </ul>;
         }
-        return (
+        var body = (
             <li>
         		<div className="btn-group">
-        		    <a href="#" className="btn btn-default btn-mini">&larr;</a>
         		    <a href="#" className="btn btn-default btn-mini" onClick={this.props.onRaise.bind(this, this.props.parentUser, this.props.user)}>{this.props.user.name}</a>
         		    <a href="#" className="btn btn-default btn-mini" onClick={this.props.onRaise.bind(this, this.props.parentUser, this.props.user)}>&uarr;</a>
-        		    <a href="#" className="btn btn-default btn-mini">&rarr;</a>
+        		    <a href="#" className="btn btn-default btn-mini dropdown-toggle" data-toggle="dropdown">&rarr;</a>
+                    <ul className="dropdown-menu">
+                        <li>name 1</li>
+                    </ul>
                 </div>
         		{subordinates}
         	</li>
         );
+        return this.props.parentUser ? body : <ul>{body}</ul>;
     }
 }
 

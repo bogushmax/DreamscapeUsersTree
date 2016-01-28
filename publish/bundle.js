@@ -19664,8 +19664,8 @@
 	        _super.call(this, props);
 	        this.state = {};
 	        this.services = new Services();
-	        this.services.addUpdateUsersListener(function (rootUser) {
-	            _this.setState({ rootUser: rootUser });
+	        this.services.addUpdateUsersListener(function (data) {
+	            _this.setState({ data: data });
 	        });
 	        this.services.addConnectListener(function () {
 	            _this.services.sendUsersUpdateRequest();
@@ -19679,22 +19679,13 @@
 	                tempName = parentUser.name;
 	                parentUser.name = user.name;
 	                user.name = tempName;
-	                this.services.sendUsersChangeMessage(this.state.rootUser);
-	                this.setState({ rootUser: this.state.rootUser, lastRaisedUser: parentUser });
+	                this.services.sendUsersChangeMessage(this.state.data);
+	                this.setState({ rootUser: this.state.data.users, lastRaisedUser: parentUser });
 	            }
 	        }
 	    };
-	    /*
-	    onMoveToLeftChief(parentUser, user) {
-	
-	    }
-	
-	    onMoveToRightChief(parentUser, user) {
-	    
-	    }
-	    */
 	    Main.prototype.render = function () {
-	        return (React.createElement("div", {"className": "tree"}, this.state.rootUser ? React.createElement("ul", null, React.createElement(Node, {"user": this.state.rootUser, "parentUser": null, "onRaise": this.onRaise.bind(this)})) : false));
+	        return (React.createElement("div", {"className": "tree"}, (this.state.data && this.state.data.users) ? React.createElement(Node, {"user": this.state.data.users, "parentUser": null, "onRaise": this.onRaise.bind(this)}) : false));
 	    };
 	    return Main;
 	})(React.Component);
@@ -19714,10 +19705,10 @@
 	        this.socket.on('connect', callback);
 	    };
 	    Services.prototype.removeConnectListener = function (callback) {
-	        this.socket.removeListener(callback);
+	        this.socket.removeListener('connect', callback);
 	    };
 	    Services.prototype.addUpdateUsersListener = function (callback) {
-	        this.socket.on('updateUsers', function (usersRaw) { callback(usersRaw); });
+	        this.socket.on('updateUsers', callback);
 	    };
 	    Services.prototype.removeUpdateUsersListener = function (callback) {
 	        this.socket.removeListener('updateUsers', callback);
@@ -19725,8 +19716,8 @@
 	    Services.prototype.sendUsersUpdateRequest = function () {
 	        this.socket.emit('getUsers');
 	    };
-	    Services.prototype.sendUsersChangeMessage = function (users) {
-	        this.socket.emit('changeUsers', users);
+	    Services.prototype.sendUsersChangeMessage = function (data) {
+	        this.socket.emit('changeUsers', data);
 	    };
 	    return Services;
 	})();
@@ -27370,7 +27361,8 @@
 	                    return React.createElement(Node, {"user": user, "parentUser": _this.props.user, "onRaise": _this.props.onRaise});
 	                }));
 	        }
-	        return (React.createElement("li", null, React.createElement("div", {"className": "btn-group"}, React.createElement("a", {"href": "#", "className": "btn btn-default btn-mini"}, "←"), React.createElement("a", {"href": "#", "className": "btn btn-default btn-mini", "onClick": this.props.onRaise.bind(this, this.props.parentUser, this.props.user)}, this.props.user.name), React.createElement("a", {"href": "#", "className": "btn btn-default btn-mini", "onClick": this.props.onRaise.bind(this, this.props.parentUser, this.props.user)}, "↑"), React.createElement("a", {"href": "#", "className": "btn btn-default btn-mini"}, "→")), subordinates));
+	        var body = (React.createElement("li", null, React.createElement("div", {"className": "btn-group"}, React.createElement("a", {"href": "#", "className": "btn btn-default btn-mini", "onClick": this.props.onRaise.bind(this, this.props.parentUser, this.props.user)}, this.props.user.name), React.createElement("a", {"href": "#", "className": "btn btn-default btn-mini", "onClick": this.props.onRaise.bind(this, this.props.parentUser, this.props.user)}, "↑"), React.createElement("a", {"href": "#", "className": "btn btn-default btn-mini dropdown-toggle", "data-toggle": "dropdown"}, "→"), React.createElement("ul", {"className": "dropdown-menu"}, React.createElement("li", null, "name 1"))), subordinates));
+	        return this.props.parentUser ? body : React.createElement("ul", null, body);
 	    };
 	    return Node;
 	})(React.Component);

@@ -12,14 +12,14 @@ class Services {
     }
     
     removeConnectListener(callback: () => void) : void {
-        this.socket.removeListener(callback);
+        this.socket.removeListener('connect', callback);
     }
     
-    addUpdateUsersListener(callback: (users : {}) => void) : void {
-        this.socket.on('updateUsers', (usersRaw : {}) => { callback(usersRaw) });
+    addUpdateUsersListener(callback: (data : {}) => void) : void {
+        this.socket.on('updateUsers', callback);
     }
     
-    removeUpdateUsersListener(callback: (users : string) => void) : void {
+    removeUpdateUsersListener(callback: (data : {}) => void) : void {
         this.socket.removeListener('updateUsers', callback);
     }
     
@@ -27,8 +27,8 @@ class Services {
         this.socket.emit('getUsers');
     }
     
-    sendUsersChangeMessage(users) : void {
-        this.socket.emit('changeUsers', users);
+    sendUsersChangeMessage(data) : void {
+        this.socket.emit('changeUsers', data);
     }
 }
 
